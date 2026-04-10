@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ming Xuan 名轩 PRO MAX</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet"><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#0f0f0f;color:white;}
+
+nav{background:linear-gradient(90deg,#ff0000,#ff9900);padding:15px;text-align:center;position:sticky;top:0;z-index:10;}
+nav h1{font-size:26px;}
+
+.hero{height:80vh;background:url('https://images.unsplash.com/photo-1606787366850-de6330128bfc') center/cover;display:flex;align-items:center;justify-content:center;text-align:center;}
+.hero h2{background:rgba(0,0,0,0.7);padding:20px;border-radius:10px;font-size:2.5em;}
+
+section{padding:40px 20px;text-align:center;}
+
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
+
+.card{background:#1c1c1c;border-radius:15px;overflow:hidden;transition:0.3s;}
+.card:hover{transform:scale(1.05) rotate(1deg);}
+.card img{width:100%;height:160px;object-fit:cover;}
+.card button{margin:10px;background:#ff0000;border:none;padding:10px;color:white;border-radius:8px;cursor:pointer;}
+
+.cart{position:fixed;bottom:10px;right:10px;background:#000;padding:15px;border-radius:15px;width:240px;max-height:350px;overflow:auto;box-shadow:0 0 10px red;}
+
+input{padding:10px;margin:5px;width:80%;border-radius:5px;border:none;}
+
+.btn{background:#25D366;padding:12px 20px;color:white;border:none;border-radius:8px;cursor:pointer;margin-top:10px;}
+
+.admin{background:#111;padding:20px;margin-top:20px;border-top:2px solid red;}
+
+.badge{background:red;padding:3px 8px;border-radius:5px;font-size:12px;margin-left:5px;}
+
+footer{background:#000;padding:20px;text-align:center;margin-top:20px;}
+</style></head><body><nav><h1>🍜 Ming Xuan 名轩 <span class="badge">PRO</span></h1></nav><div class="hero">
+<h2>🔥 Pedidos Online en Tiempo Real</h2>
+</div><section>
+<h2>🏮 Sobre Nosotros</h2>
+<p>Comida china auténtica, rápida y deliciosa en Santiago. Más de 10 años sirviendo calidad 🔥</p>
+</section><section>
+<h2>🍜 Menú</h2>
+<div class="menu" id="menu"></div>
+</section><section>
+<h2>🛒 Pedido</h2>
+<input id="nombre" placeholder="Nombre">
+<input id="direccion" placeholder="Dirección">
+<select id="pago">
+<option>Efectivo</option>
+<option>Transferencia</option>
+<option>Tarjeta</option>
+</select>
+<br>
+<button class="btn" onclick="enviarPedido()">Enviar Pedido</button>
+</section><section>
+<h2>📍 Ubicación</h2>
+<p>Estación Central, Santiago</p>
+<iframe src="https://maps.google.com/maps?q=-33.4751975,-70.7035146&z=15&output=embed"></iframe>
+</section><div class="cart">
+<h3>🛒 Carrito</h3>
+<ul id="lista"></ul>
+<p>Total: $<span id="total">0</span></p>
+<button onclick="vaciar()" style="background:gray;margin-top:10px;">Vaciar</button>
+</div><section class="admin">
+<h2>📊 Panel de Pedidos</h2>
+<ul id="pedidos"></ul>
+</section><footer>
+<p>📞 +56 9 5704 3092 | Ming Xuan © 2026</p>
+</footer><script>
+const productos=[
+{name:"Carne Mongoliana",precio:7000,img:"https://images.unsplash.com/photo-1604908176997-431c4d4c60e9"},
+{name:"Chapsui Pollo",precio:6500,img:"https://images.unsplash.com/photo-1604908812838-51d8c75d1c07"},
+{name:"Arroz Chaufán",precio:6000,img:"https://images.unsplash.com/photo-1603133872878-684f208fb84b"},
+{name:"Wantán",precio:4000,img:"https://images.unsplash.com/photo-1604908177522-402fd5db4a77"}
+];
+
+let carrito=[];
+let pedidos=[];
+
+productos.forEach((p,i)=>{
+menu.innerHTML+=`<div class="card">
+<img src="${p.img}">
+<h3>${p.name}</h3>
+<p>$${p.precio}</p>
+<button onclick="agregar(${i})">Agregar</button>
+</div>`;
+});
+
+function agregar(i){
+carrito.push(productos[i]);
+actualizar();
+}
+
+function actualizar(){
+lista.innerHTML="";
+let total=0;
+carrito.forEach(p=>{
+lista.innerHTML+=`<li>${p.name} - $${p.precio}</li>`;
+total+=p.precio;
+});
+totalEl.innerText=total;
+}
+
+function vaciar(){carrito=[];actualizar();}
+
+const lista=document.getElementById("lista");
+const totalEl=document.getElementById("total");
+
+function enviarPedido(){
+const n=nombre.value;
+const d=direccion.value;
+const pago=document.getElementById("pago").value;
+
+if(!n||!d){alert("Completa datos");return;}
+
+let total=totalEl.innerText;
+
+pedidos.push(`${n} - $${total} - ${pago}`);
+renderPedidos();
+
+let txt=`🍜 Pedido Ming Xuan%0ACliente: ${n}%0A`;
+carrito.forEach(p=>txt+=`- ${p.name} $${p.precio}%0A`);
+txt+=`Total: $${total}%0APago: ${pago}%0ADirección: ${d}`;
+
+window.open(`https://wa.me/56957043092?text=${txt}`);
+
+carrito=[];
+actualizar();
+}
+
+function renderPedidos(){
+pedidosEl.innerHTML="";
+pedidos.forEach(p=>pedidosEl.innerHTML+=`<li>${p}</li>`);
+}
+
+const pedidosEl=document.getElementById("pedidos");
+</script></body>
+</html>
